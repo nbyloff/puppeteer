@@ -2,7 +2,6 @@ services:
   node:
     image: "bugs_node:latest"
     container_name: "demo_node"
-    restart: unless-stopped
     volumes:
       - ./config/demo.js:/home/web/demo.js
       - ./pdf:/home/web/pdf
