@@ -1,5 +1,6 @@
 services:
   node:
+    platform: linux/x86_64
     image: "bugs_node:latest"
     container_name: "demo_node"
     volumes:
