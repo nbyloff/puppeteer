@@ -12,6 +12,25 @@ services:
     extra_hosts:
       - host.docker.internal:host-gateway
 
+  chromium:
+    #image: zenika/alpine-chrome
+    image: chromium:latest
+    container_name: "demo_chromium"
+    command:
+      [
+        chromium-browser,
+        "--headless",
+        "--disable-gpu",
+        "--remote-debugging-address=0.0.0.0",
+        "--remote-debugging-port=9222",
+      ]
+    cap_add:
+      - SYS_ADMIN
+    volumes:
+      - ./tmpfiles:/tmp
+    ports:
+      - "9222:9222"
+
   web:
     image: nginx:latest
     container_name: "demo_nginx"

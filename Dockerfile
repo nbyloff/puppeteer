@@ -1,5 +1,6 @@
 # Set master image
-FROM --platform=linux/amd64 php:8.2-fpm
+# FROM --platform=linux/amd64 php:8.2-fpm
+FROM php:8.2-fpm
 
 ARG UID
 
@@ -9,6 +10,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN useradd -u $UID -g www-data -m web -d /home/web \
     && mkdir /home/web/.nvm
+COPY --chown=web:www-data config/package.json /home/web/package.json
 
 # Configure default locale (important for chrome-headless-shell).
 ENV LANG=en_US.UTF-8
@@ -29,18 +31,20 @@ RUN apt-get update \
 USER web
 WORKDIR /home/web
 
-COPY puppeteer-browsers-latest.tgz puppeteer-latest.tgz puppeteer-core-latest.tgz ./
+ENV DBUS_SESSION_BUS_ADDRESS=autolaunch:
 
-# Install @puppeteer/browsers, puppeteer and puppeteer-core into /home/pptruser/node_modules.
+# Install @puppeteer/browsers, puppeteer and puppeteer-core into /home/web/node_modules.
 RUN echo 'export NVM_DIR="$HOME/.nvm"'                                       >> "$HOME/.bashrc" \
     && echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> "$HOME/.bashrc" \
     && echo '[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion" # This loads nvm bash_completion' >> "$HOME/.bashrc" \
     && . $HOME/.nvm/nvm.sh \
+    && . $HOME/.bashrc \
     && nvm install $NODE_VERSION \
     && nvm use $NODE_VERSION \
-    && npm i /home/web/puppeteer-browsers-latest.tgz /home/web/puppeteer-core-latest.tgz /home/web/puppeteer-latest.tgz \
-    && rm /home/web/puppeteer-browsers-latest.tgz /home/web/puppeteer-core-latest.tgz /home/web/puppeteer-latest.tgz \
-    && (node -e "require('child_process').execSync(require('puppeteer').executablePath() + ' --credits', {stdio: 'inherit'})" > THIRD_PARTY_NOTICES)
+    && cd /home/web \
+    && node --version \
+    && npm --version \
+    && npm install puppeteer@^22
 
 
 # set command to run puppeteer script
