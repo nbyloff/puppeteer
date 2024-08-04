@@ -80,8 +80,8 @@
 
     </style>
 
-    <!--  <script src="https://unpkg.com/pagedjs@0.5.0-beta.1/dist/paged.polyfill.js"></script>-->
     <script src="/demo/paged.polyfill.js"></script>
+    <!--    <script src="https://unpkg.com/pagedjs@0.4.3/dist/paged.polyfill.js"></script>-->
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
           crossorigin="anonymous">
@@ -90,13 +90,15 @@
 <body style="">
 
 <script>
+    console.log('3');
+
     class ReportLoadedHandler extends Paged.Handler {
         constructor(chunker, polisher, caller) {
             super(chunker, polisher, caller);
         }
 
         afterRendered(pages) {
-            console.log('loaded report');
+            console.log('4');
             window.report = 'ready'; // var for PDF generation to monitor so we know when to save PDF
         }
     }
@@ -113,7 +115,6 @@
         }
 
         afterPageLayout(pageElement, page, breakToken, chunker) {
-            console.log(page);
             this.chunker = chunker;
             this.splitTablesRefs = [];
 

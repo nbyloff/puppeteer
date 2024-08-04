@@ -6,17 +6,31 @@ async function main() {
         headless: 'new',
         timeout: 0,
         ignoreHTTPSErrors: true,
-        //executablePath: '/home/web/.cache/puppeteer/chrome/linux-127.0.6533.88'
-        executablePath: '/opt/google/chrome/chrome',
-        //executablePath: '/usr/bin/chromium',
+        args: [
+            '--no-sandbox',
+            '--disable-web-security',   // maybe fixes issues related to cors, etc
+            '--disable-gpu',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+        ],
     });
 
     const page = await browser.newPage();
-    await page.goto('http://host.docker.internal:8080/');
+    page.on('console', message =>
+        console.log(`${message.type().substr(0, 3).toUpperCase()} ${message.text()}`))
+        .on('pageerror', ({message}) => console.log(message))
+        .on('response', response =>
+            console.log(`${response.status()} ${response.url()}`))
+        .on('requestfailed', request =>
+            console.log(`${request.failure().errorText} ${request.url()}`))
+
+    await page.goto('http://demo.test:8080/', {waitUntil: 'networkidle2'});
+    //await page.goto('file:///demo.html');
+    //await page.goto('https://www.google.com/');
 
     await page.content();
     await page.waitForFunction('window.report == "ready"');
-    //await page.screenshot({path: 'screenshot.png'});
+    //await page.screenshot({path: 'pdf/screenshot.png'});
 
     const requestOptions = {};
     requestOptions.path = '/home/web/pdf/bugs.pdf';

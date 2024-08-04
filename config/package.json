@@ -2,10 +2,6 @@
   "private": true,
   "type": "module",
   "devDependencies": {
-    "puppeteer": "file:puppeteer-latest.tgz"
-  },
-  "dependencies": {
-    "@puppeteer/browsers": "file:puppeteer-browsers-latest.tgz",
-    "puppeteer-core": "file:puppeteer-core-latest.tgz"
+    "puppeteer": "22.15.0"
   }
 }
