@@ -3,10 +3,12 @@ FROM --platform=linux/amd64 php:8.2-fpm
 
 ARG UID
 
+
+# Set the SHELL to bash with pipefail option
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 RUN useradd -u $UID -g www-data -m web -d /home/web \
     && mkdir /home/web/.nvm
-
-COPY --chown=web:www-data ./config/package.json /home/web/package.json
 
 # Configure default locale (important for chrome-headless-shell).
 ENV LANG=en_US.UTF-8
@@ -22,23 +24,24 @@ RUN apt-get update \
     && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-khmeros fonts-kacst fonts-freefont-ttf libxss1 dbus dbus-x11 \
       --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
-    && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash \
-    && . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION} \
-    && . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION} \
-    && . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION} \
-    #&& cd /home/web \
-    #&& npm install \
-    #&& node /home/web/node_modules/puppeteer/install.mjs
+    && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+
+USER web
+WORKDIR /home/web
 
 COPY puppeteer-browsers-latest.tgz puppeteer-latest.tgz puppeteer-core-latest.tgz ./
 
 # Install @puppeteer/browsers, puppeteer and puppeteer-core into /home/pptruser/node_modules.
-RUN npm i ./puppeteer-browsers-latest.tgz ./puppeteer-core-latest.tgz ./puppeteer-latest.tgz \
-    && rm ./puppeteer-browsers-latest.tgz ./puppeteer-core-latest.tgz ./puppeteer-latest.tgz \
+RUN echo 'export NVM_DIR="$HOME/.nvm"'                                       >> "$HOME/.bashrc" \
+    && echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> "$HOME/.bashrc" \
+    && echo '[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion" # This loads nvm bash_completion' >> "$HOME/.bashrc" \
+    && . $HOME/.nvm/nvm.sh \
+    && nvm install $NODE_VERSION \
+    && nvm use $NODE_VERSION \
+    && npm i /home/web/puppeteer-browsers-latest.tgz /home/web/puppeteer-core-latest.tgz /home/web/puppeteer-latest.tgz \
+    && rm /home/web/puppeteer-browsers-latest.tgz /home/web/puppeteer-core-latest.tgz /home/web/puppeteer-latest.tgz \
     && (node -e "require('child_process').execSync(require('puppeteer').executablePath() + ' --credits', {stdio: 'inherit'})" > THIRD_PARTY_NOTICES)
 
-USER web
-WORKDIR /home/web
 
 # set command to run puppeteer script
 CMD ["node", "demo.js"]
