@@ -24,13 +24,11 @@ async function main() {
         .on('requestfailed', request =>
             console.log(`${request.failure().errorText} ${request.url()}`))
 
-    await page.goto('http://demo.test:8080/', {waitUntil: 'networkidle2'});
-    //await page.goto('file:///demo.html');
-    //await page.goto('https://www.google.com/');
+    await page.goto('http://demo.test:8080/');
 
     await page.content();
-    await page.waitForFunction('window.report == "ready"');
-    //await page.screenshot({path: 'pdf/screenshot.png'});
+    //await page.waitForFunction('window.report == "ready"');
+    await page.screenshot({path: 'pdf/screenshot.png'});
 
     const requestOptions = {};
     requestOptions.path = '/home/web/pdf/bugs.pdf';

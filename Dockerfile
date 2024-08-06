@@ -48,5 +48,5 @@ RUN echo 'export NVM_DIR="$HOME/.nvm"'                                       >> 
 
 
 # set command to run puppeteer script
-#CMD ["node", "demo.js"]
-CMD ["php-fpm"]
+CMD ["node", "demo.js"]
+#CMD ["php-fpm"]
