@@ -90,7 +90,7 @@
 <body style="">
 
 <script>
-    console.log('3');
+    console.log('loading');
 
     class ReportLoadedHandler extends Paged.Handler {
         constructor(chunker, polisher, caller) {
@@ -98,7 +98,7 @@
         }
 
         afterRendered(pages) {
-            console.log('4');
+            console.log('loaded');
             window.report = 'ready'; // var for PDF generation to monitor so we know when to save PDF
         }
     }

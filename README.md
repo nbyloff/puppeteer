@@ -11,20 +11,9 @@ docker build --build-arg UID=$(id -u) -t bugs_node .
 ````shell
 docker-compose up -d
 ````
-3. Wait for process to complete and view `pdf/bugs.pdf`
 
-Click the first table of contents link on page 2 in the PDF. It no longer takes you to the correct position in the document.
+There are two `console.log` statements in a <script> tag in the `html/index.html` file that is loaded. "loading" when 
+it enters the script tag, and "loaded" when paged.js is finished rendering the page. "loaded" is never called when 
+using docker & puppeteer, but if you load the page in your browser, it works perfectly.
 
-Test HTML located in `html/demo.html`
-
-
-When viewing the PDF output with a text editor, references found related to H4 section tags have a negative number. 
-If they are changed to positive, the document at least goes to the correct page, but not the exact position. 
-````
-43 0 obj
-<</section1 [11 0 R /XYZ 72 -700.08002 0]
-/section2 [38 0 R /XYZ 72 -8977.8301 0]>>
-endobj
-````
-
-https://github.com/puppeteer/puppeteer/blob/main/docker/Dockerfile
+If I comment out the `paged.polyfill.js` script, the `demo.js` builds as expected, producting a `pdf/bugs.pdf` document.
