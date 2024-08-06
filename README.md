@@ -17,3 +17,6 @@ it enters the script tag, and "loaded" when paged.js is finished rendering the p
 using docker & puppeteer, but if you load the page in your browser, it works perfectly.
 
 If I comment out the `paged.polyfill.js` script, the `demo.js` builds as expected, producting a `pdf/bugs.pdf` document.
+
+Open this page to see what the final result should be.
+http://demo.test:8080
