@@ -6,13 +6,15 @@ async function main() {
         headless: 'new',
         timeout: 0,
         ignoreHTTPSErrors: true,
-        args: [
-            '--no-sandbox',
-            '--disable-web-security',   // maybe fixes issues related to cors, etc
-            '--disable-gpu',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-        ],
+        // args: [
+        //     //'--remote-debugging-port=9222',
+        //     //'--remote-debugging-address=0.0.0.0',
+        //     '--no-sandbox',
+        //     '--disable-web-security',   // maybe fixes issues related to cors, etc
+        //     '--disable-gpu',
+        //     '--disable-setuid-sandbox',
+        //     '--disable-dev-shm-usage',
+        // ],
     });
 
     const page = await browser.newPage();
@@ -24,7 +26,7 @@ async function main() {
         .on('requestfailed', request =>
             console.log(`${request.failure().errorText} ${request.url()}`))
 
-    await page.goto('http://demo.test:8080/');
+    await page.goto('http://demo.test:8080/demo.html', { waitUntil: 'networkidle2' });
 
     await page.content();
     //await page.waitForFunction('window.report == "ready"');
