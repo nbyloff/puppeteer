@@ -4,11 +4,11 @@ FROM php:8.2-fpm
 
 ARG UID
 
-
 # Set the SHELL to bash with pipefail option
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN useradd -u $UID -g www-data -m web -d /home/web \
+#RUN useradd -g www-data -m web -d /home/web \
     && mkdir /home/web/.nvm
 COPY --chown=web:www-data config/package.json /home/web/package.json
 
@@ -32,6 +32,7 @@ USER web
 WORKDIR /home/web
 
 ENV DBUS_SESSION_BUS_ADDRESS=autolaunch:
+#ENV PUPPETEER_SKIP_DOWNLOAD=true;
 
 # Install @puppeteer/browsers, puppeteer and puppeteer-core into /home/web/node_modules.
 RUN echo 'export NVM_DIR="$HOME/.nvm"'                                       >> "$HOME/.bashrc" \
@@ -42,11 +43,14 @@ RUN echo 'export NVM_DIR="$HOME/.nvm"'                                       >> 
     && nvm install $NODE_VERSION \
     && nvm use $NODE_VERSION \
     && cd /home/web \
-    && node --version \
-    && npm --version \
+#    && node --version \
+#    && npm --version \
     && npm install puppeteer@^22
 
 
 # set command to run puppeteer script
-CMD ["node", "demo.js"]
-#CMD ["php-fpm"]
+#CMD ["node", "demo.js"]
+CMD ["php-fpm"]
+
+
+# https://gist.github.com/rjozefowicz/fa0618fce8e6ae28ff5c46b65ba7defd
