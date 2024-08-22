@@ -31,10 +31,7 @@ RUN apt-get update \
 USER web
 WORKDIR /home/web
 
-ENV DBUS_SESSION_BUS_ADDRESS=autolaunch:
-#ENV PUPPETEER_SKIP_DOWNLOAD=true;
-
-# Install @puppeteer/browsers, puppeteer and puppeteer-core into /home/web/node_modules.
+# install puppeteer
 RUN echo 'export NVM_DIR="$HOME/.nvm"'                                       >> "$HOME/.bashrc" \
     && echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm' >> "$HOME/.bashrc" \
     && echo '[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion" # This loads nvm bash_completion' >> "$HOME/.bashrc" \
@@ -43,14 +40,7 @@ RUN echo 'export NVM_DIR="$HOME/.nvm"'                                       >> 
     && nvm install $NODE_VERSION \
     && nvm use $NODE_VERSION \
     && cd /home/web \
-#    && node --version \
-#    && npm --version \
     && npm install puppeteer@^22
 
-
 # set command to run puppeteer script
-#CMD ["node", "demo.js"]
-CMD ["php-fpm"]
-
-
-# https://gist.github.com/rjozefowicz/fa0618fce8e6ae28ff5c46b65ba7defd
+CMD ["node", "demo.js"]
