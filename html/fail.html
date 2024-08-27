@@ -1,0 +1,287 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script src="https://unpkg.com/pagedjs@0.4.3/dist/paged.polyfill.js"></script>
+<!--    <script src="demo/paged.polyfill.js"></script>-->
+</head>
+<style>
+    @page cover {
+        margin: 0;
+
+        @bottom-center {
+            content: none;
+        }
+    }
+
+    @media print {
+        #list-toc-generated {
+            list-style: none;
+            padding-left: 0px;
+        }
+
+        #list-toc-generated .toc-element a::after {
+            content: target-counter(attr(href), page);
+            float: right;
+        }
+
+        #list-toc-generated .toc-element-level-1 {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        #list-toc-generated {
+            counter-reset: counterTocLevel1;
+        }
+
+        #list-toc-generated .toc-element-level-1 {
+            counter-increment: counterTocLevel1;
+            counter-reset: counterTocLevel2;
+        }
+
+        #list-toc-generated .toc-element-level-2 {
+            counter-increment: counterTocLevel2;
+        }
+
+        #list-toc-generated {
+            overflow-x: hidden;
+        }
+
+        #list-toc-generated .toc-element::after {
+            content: ".................................................................................................................................................";
+            float: left;
+            width: 0;
+            padding-left: 5px;
+            letter-spacing: 2px;
+        }
+
+        #list-toc-generated .toc-element {
+            display: flex;
+        }
+
+        #list-toc-generated .toc-element a::after {
+            position: absolute;
+            right: 0;
+            background-color: white;
+            padding-left: 6px;
+        }
+
+        #list-toc-generated .toc-element a {
+            right: 0;
+        }
+    }
+
+    @media screen {
+        body {
+            background-color: whitesmoke;
+        }
+
+        .pagedjs_pages {
+            display: flex;
+            width: var(--pagedjs-width);
+            flex: 0;
+            flex-wrap: wrap;
+            margin: 0 auto;
+        }
+
+        .pagedjs_page {
+            background-color: white;
+            box-shadow: 0 0 0 2px #888;
+            margin: 0;
+            flex-shrink: 0;
+            flex-grow: 0;
+            margin-top: 10mm;
+        }
+
+        #pagedjs_interface_header {
+            position: fixed;
+            background-color: #888;
+            width: 100vw;
+            height: 30px;
+            top: 0;
+            left: 0;
+
+        }
+    }
+
+    body {
+        counter-reset: titleLevel1;
+    }
+
+    h2 {
+        counter-increment: titleLevel1;
+        counter-reset: titleLevel2;
+    }
+
+    h2::before {
+        content: counter(titleLevel1) ". ";
+    }
+
+    h3 {
+        counter-increment: titleLevel2;
+    }
+
+    h3::before {
+        content: counter(titleLevel1) ". "counter(titleLevel2) ". ";
+    }
+
+    @media print {
+        @page {
+            size: A4;
+
+            @bottom-right {
+                content: counter(page);
+            }
+        }
+
+        .cover {
+            break-after: always;
+        }
+
+        h1.chapter-title {
+            break-before: page;
+        }
+    }
+
+    .cover {
+        page: cover;
+        width: 100%;
+        height: 100%;
+    }
+
+    .cover h1 {
+        padding-top: 50%;
+        text-align: center;
+    }
+
+    @page cover {
+        margin: 0;
+
+        @bottom-center {
+            content: none;
+        }
+    }
+</style>
+
+<script>
+
+    function createToc(config) {
+        const content = config.content;
+        const tocElement = config.tocElement;
+        const titleElements = config.titleElements;
+
+        let tocElementDiv = content.querySelector(tocElement);
+        let tocUl = document.createElement("ul");
+        tocUl.id = "list-toc-generated";
+        tocElementDiv.appendChild(tocUl);
+
+        // add class to all title elements
+        let tocElementNbr = 0;
+        for (var i = 0; i < titleElements.length; i++) {
+
+            let titleHierarchy = i + 1;
+            let titleElement = content.querySelectorAll(titleElements[i]);
+
+
+            titleElement.forEach(function (element) {
+
+                // add classes to the element
+                element.classList.add("title-element");
+                element.setAttribute("data-title-level", titleHierarchy);
+
+                // add id if doesn't exist
+                tocElementNbr++;
+                idElement = element.id;
+                if (idElement == '') {
+                    element.id = 'title-element-' + tocElementNbr;
+                }
+                let newIdElement = element.id;
+
+            });
+
+        }
+
+        // create toc list
+        let tocElements = content.querySelectorAll(".title-element");
+        for (var i = 0; i < tocElements.length; i++) {
+            let tocElement = tocElements[i];
+
+            let tocNewLi = document.createElement("li");
+
+            // Add class for the hierarcy of toc
+            tocNewLi.classList.add("toc-element");
+            tocNewLi.classList.add("toc-element-level-" + tocElement.dataset.titleLevel);
+
+            // Keep class of title elements
+            let classTocElement = tocElement.classList;
+            for (var n = 0; n < classTocElement.length; n++) {
+                if (classTocElement[n] != "title-element") {
+                    tocNewLi.classList.add(classTocElement[n]);
+                }
+            }
+
+            // Create the element
+            tocNewLi.innerHTML = '<a href="#' + tocElement.id + '">' + tocElement.innerHTML + '</a>';
+            tocUl.appendChild(tocNewLi);
+        }
+
+    }
+
+    class handlers extends Paged.Handler {
+        constructor(chunker, polisher, caller) {
+            super(chunker, polisher, caller);
+        }
+
+        beforeParsed(content) {
+            createToc({
+                content: content,
+                tocElement: '#my-toc-content',
+                titleElements: ['.manual-payload h1.chapter-title']
+            });
+        }
+
+        beforePageLayout(page) {
+            console.log('beforePageLayout');
+        }
+        afterPageLayout(pageElement, page, breakToken) {
+            console.log('afterPageLayout');
+        }
+    }
+    Paged.registerHandlers(handlers);
+</script>
+
+<body>
+
+<!-- cover -->
+<div class="cover">
+    <h1>AWS CLI</h1>
+</div>
+
+<!-- ToC -->
+<div id="table-of-content">
+    <h1>Table of content</h1>
+    <nav id="my-toc-content">
+
+    </nav>
+</div>
+
+<!-- payload -->
+<div class="manual-payload">
+    <article id="chapter1">
+        <h1 class="chapter-title">1. AWS CLI</h2>
+            <p>tadam #1</p>
+    </article>
+
+    <article id="chapter1.1">
+        <h1 class="chapter-title">1.1 Installation</h2>
+            <p>tadam #1.1</p>
+    </article>
+
+    <article id="chapter2">
+        <h1 class="chapter-title">2. Aurora</h2>
+            <p>tadam #2</p>
+    </article>
+</div>
+
+</html>
