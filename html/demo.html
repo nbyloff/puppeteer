@@ -3,7 +3,8 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
+    <script src="https://unpkg.com/pagedjs@0.4.3/dist/paged.polyfill.js"></script>
+<!--    <script src="demo/paged.polyfill.js"></script>-->
 </head>
 <style>
     @page cover {
@@ -164,6 +165,7 @@
 </style>
 
 <script>
+
     function createToc(config) {
         const content = config.content;
         const tocElement = config.tocElement;
@@ -202,7 +204,6 @@
 
         // create toc list
         let tocElements = content.querySelectorAll(".title-element");
-
         for (var i = 0; i < tocElements.length; i++) {
             let tocElement = tocElements[i];
 
@@ -240,6 +241,12 @@
             });
         }
 
+        beforePageLayout(page) {
+            console.log('beforePageLayout');
+        }
+        afterPageLayout(pageElement, page, breakToken) {
+            console.log('afterPageLayout');
+        }
     }
     Paged.registerHandlers(handlers);
 </script>
